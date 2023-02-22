@@ -1,42 +1,44 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.StringTokenizer;
 
 public class Main {
-
-	static int[] numbers;
 	static int N, M;
-	static StringBuilder sb = new StringBuilder();
+	static int[] selected;
+	static StringBuilder sb;
 	
-	static void comb(int cnt, int start) {
+	static void select(int cnt, int start) {
 		if(cnt == M) {
-			for(int data : numbers) {
-				sb.append(data).append(" ");
+			for(int num : selected) {
+				sb.append(num).append(" ");
 			}
 			sb.append("\n");
 			return;
 		}
 		
-	
 		for(int i=start; i<=N; i++) {
-			
-			numbers[cnt] = i;
-			comb(cnt+1, i+1);
+			selected[cnt] = i;
+			select(cnt+1, i+1);
 		}
 	}
-	
+
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+		sb = new StringBuilder();
 		
+		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
 		N = Integer.parseInt(st.nextToken());
 		M = Integer.parseInt(st.nextToken());
+		selected = new int[M];
 		
-		numbers = new int[M];
+		select(0, 1);
 		
-		comb(0, 1);
-		System.out.println(sb.toString());
+		bw.write(sb.toString());
+		bw.flush(); bw.close(); br.close();
 	}
 
 }
