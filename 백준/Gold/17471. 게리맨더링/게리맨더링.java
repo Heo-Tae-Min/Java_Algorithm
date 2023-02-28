@@ -35,26 +35,34 @@ public class Main {
 	
 	static void select(int cnt, int sum) {
 		if(cnt == N+1) {
+			// 선택된 구역의 수
 			int size = selected.size();
-			if(size == 0 || size == N) return;
+			// 선택된 지역구가 없는 경우, 모두 선택된 경우는 다루지 않음
+			if(size == N) return;
 
+			// 선택되지 않은 지역 리스트 생성
 			List<Integer> unselected = new ArrayList<>();
 			for(int i=1; i<=N; i++) {
 				if(!selected.contains(i)) unselected.add(i);
 			}
 			
+			// 선택된 구역끼리 union
 			for(int i=1; i<size; i++) {
 				union(selected.get(i-1), selected.get(i));
 			}
 
+			// 선택되지 않은 구역끼리 union
 			for(int i=1; i<N-size; i++) {
 				union(unselected.get(i-1), unselected.get(i));
 			}
 			
+			// 두 선거구 모두 끊겨 있지 않은 경우
 			if(isConnected(selected.get(0), size) && isConnected(unselected.get(0), N-size)) {
+				// 선거구끼리의 인구수 차이를 계산 & 갱신
 				min_diff = Math.min(min_diff, Math.abs(total - sum*2));
 			}
 			
+			// parent 배열 초기화
 			makeSet();
 			
 			return;
@@ -81,6 +89,7 @@ public class Main {
 			int now = queue.poll();
 			cnt++;
 			for(int next : adjList[now]) {
+				// 연결된 정점끼리 같은 선거구일 때만 queue에 삽입 => 다른 선거구라면 끊어진 걸로 봄
 				if(!visited[next] && findSet(now) == findSet(next)) {
 					queue.offer(next);
 					visited[next] = true;
@@ -88,6 +97,7 @@ public class Main {
 			}
 		}
 		
+		// 연결된 같은 집합 내의 지역 수가 size와 같다면 true, 아니면 false
 		if(cnt == size) return true;
 		return false;
 	}
@@ -106,6 +116,7 @@ public class Main {
 			adjList[i] = new ArrayList<>();
 		}
 		
+		// 인구수, 인접 관계 입력
 		st = new StringTokenizer(br.readLine(), " ");
 		for(int i=1; i<=N; i++) {
 			population[i] = Integer.parseInt(st.nextToken());
@@ -122,9 +133,14 @@ public class Main {
 		
 		parents = new int[N+1];
 		makeSet();
-		select(1, 0);
+		// 1이 선택된 경우가 나머지 경우의 반대이기 때문에
+		// 겹치는 작업을 제거하기 위해 1을 삽입 & 나머지만 부분집합 처리
+		selected.add(1);
+		select(2, population[1]);
 		
+		// 최소 인구수 차이가 초기화 상태 그대로라면 => 가능한 경우가 없는 것이기 때문에 -1로 대체
 		if(min_diff == Integer.MAX_VALUE) min_diff = -1;
+		
 		System.out.println(min_diff);
 	}
 
